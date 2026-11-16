@@ -9,10 +9,13 @@ on:
       app:
         description: also build the Swift app (true/false)
         default: 'true'
+      runner:
+        description: macOS runner label
+        default: macos-14
 
 jobs:
   kmp:
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +55,7 @@ jobs:
 
   app:
     if: inputs.app == 'true'
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 90
     env:
       DERIVED: ${{ github.workspace }}/iosApp/build/DerivedData
