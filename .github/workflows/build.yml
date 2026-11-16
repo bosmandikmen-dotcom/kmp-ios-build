@@ -47,7 +47,7 @@ jobs:
             :core:compileKotlinIosArm64 \
             :ui-shared:compileKotlinIosArm64 \
             :core:iosSimulatorArm64Test \
-            :shared:assembleEmresSharedXCFramework 2>&1 | grep -E "^e: |^w: .*expect|FAILED|BUILD|What went wrong|> Task .* FAILED|Tests? .*(failed|passed)" | sed -E 's#file:///Users/runner/work/[^/]+/[^/]+/##' | head -400
+            :shared:assembleEmresSharedXCFramework 2>&1 | grep -E "^e: |^w: .*expect|FAILED|BUILD|What went wrong|> Task .* FAILED|Tests? .*(failed|passed)" | sed -E 's#file:///Users/runner/work/[^/]+/[^/]+/##' | head -30000
           test ${PIPESTATUS[0]} -eq 0
 
   app:
@@ -78,7 +78,7 @@ jobs:
       - name: Build EmresShared.xcframework
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon -q :shared:assembleEmresSharedXCFramework 2>&1 | grep -E "^e: |FAILED|What went wrong" | head -200
+          ./gradlew --no-daemon -q :shared:assembleEmresSharedXCFramework 2>&1 | grep -E "^e: |FAILED|What went wrong" | head -3000
           test ${PIPESTATUS[0]} -eq 0
       - name: Generate the Xcode project
         working-directory: iosApp
@@ -104,7 +104,7 @@ jobs:
           if [ -d EmresApp.xcworkspace ]; then CONTAINER="-workspace EmresApp.xcworkspace"; else CONTAINER="-project EmresApp.xcodeproj"; fi
           xcodebuild test $CONTAINER -scheme EmresApp \
             -destination "platform=iOS Simulator,id=$SIM_UDID" \
-            -derivedDataPath "$DERIVED" CODE_SIGNING_ALLOWED=NO -quiet 2>&1 | grep -E "error:|warning: .*deprecated|Test Suite|Executed|BUILD" | head -300
+            -derivedDataPath "$DERIVED" CODE_SIGNING_ALLOWED=NO -quiet 2>&1 | grep -E "error:|warning: .*deprecated|Test Suite|Executed|BUILD" | head -3000
           test ${PIPESTATUS[0]} -eq 0
       - name: Build for device (unsigned)
         working-directory: iosApp
@@ -112,5 +112,5 @@ jobs:
           if [ -d EmresApp.xcworkspace ]; then CONTAINER="-workspace EmresApp.xcworkspace"; else CONTAINER="-project EmresApp.xcodeproj"; fi
           xcodebuild build $CONTAINER -scheme EmresApp -configuration Release \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath "$DERIVED" CODE_SIGNING_ALLOWED=NO -quiet 2>&1 | grep -E "error:|BUILD" | head -200
+            -derivedDataPath "$DERIVED" CODE_SIGNING_ALLOWED=NO -quiet 2>&1 | grep -E "error:|BUILD" | head -3000
           test ${PIPESTATUS[0]} -eq 0
